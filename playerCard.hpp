@@ -34,14 +34,17 @@ class User {
     string getFirstName() const;
     string getLastName() const;
     float getBalance() const;
+    string getPassword() const;
 
     //Setters
     void setUsername(const string& username);
     void setFirstName(const string& firstname);
     void setLastName(const string& lastname);
     void addToBalance(float pay);
+    void setBalance(float pay);
     void setPassword(const string& password);
     bool checkPassword(const string& attempt);
+    
     
     
 
@@ -68,6 +71,10 @@ float User::getBalance() const{
     return balance;
 }
 
+string User::getPassword() const{
+    return password;
+}
+
 void User::setUsername(const string& username){
     this->username = username;
 }
@@ -82,6 +89,10 @@ void User::setLastName(const string& lastname){
 
 void User::setPassword(const string& password){
     this->password = password;
+}
+
+void User::setBalance(float pay){
+    this->balance = pay;
 }
 
 void User::addToBalance(float pay){
