@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <stdio.h>
 #include "playerCard.hpp"
+#include <stdlib.h>
+#include <time.h>
 
 using std::cout;
 using std::cin;
@@ -20,6 +22,7 @@ float blackJackLogic(float bet){
     bool turn = true;
     char HorS;
     bool dealerTurn = true;
+    srand(time(NULL));
     dealerAmmount = rand() % 10 + 1;
     cout << "\nDealer: " << dealerAmmount << endl;
     playerAmmount = rand() % 10 + 1;
@@ -64,12 +67,12 @@ float blackJackLogic(float bet){
         return -bet;
     } else if(dealerAmmount < playerAmmount){
         cout << "Dealer: " << dealerAmmount << "\nPlayer: " << playerAmmount << endl;
-        cout << "You win $" << bet*2;
+        cout << "You win $" << bet*2 << endl << endl;
         return bet*2;
     } else
 
     cout << "Dealer: " << dealerAmmount << "\nPlayer: " << playerAmmount << endl;
-    cout << "Push, you get your bet ammount back, $" << bet;
+    cout << "Push, you get your bet ammount back, $" << bet << endl << endl;
     return bet;
 
 }
