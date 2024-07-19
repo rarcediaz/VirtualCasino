@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <sstream>
 
 #include "database.hpp"
 #include "playerCard.hpp"
@@ -121,10 +123,64 @@ User* loggedMenu(User* user){
     return user;
 }
 
+void loadUsersFromFile(Database<string, User>& casinoBase, const string& filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error: Could not open file " << filename << endl;
+        return;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string username, firstName, lastName, password, balanceStr;
+        float balance;
+
+        if (getline(ss, username, ',') &&
+            getline(ss, firstName, ',') &&
+            getline(ss, lastName, ',') &&
+            getline(ss, balanceStr, ',') &&
+            getline(ss, password)) {
+
+            balance = stof(balanceStr);
+            User newUser(username);
+            newUser.setFirstName(firstName);
+            newUser.setLastName(lastName);
+            newUser.addToBalance(balance); // Initial balance
+            newUser.setPassword(password);
+
+            casinoBase.insert(username, newUser);
+        }
+    }
+    file.close();
+}
+
+void saveUsersToFile(Database<string, User>& casinoBase, const string& filename) {
+    ofstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error: Could not open file " << filename << endl;
+        return;
+    }
+
+    for (const auto& key : casinoBase.getAllKeys()) {
+        User user = casinoBase.search(key);
+        file << user.getUsername() << ","
+             << user.getFirstName() << ","
+             << user.getLastName() << ","
+             << fixed << setprecision(2) << user.getBalance() << ","
+             << user.getPassword() << endl;
+    }
+
+    file.close();
+}
+
+
 
 int main(){
 
     Database<string, User> casinoBase;
+    loadUsersFromFile(casinoBase, "users.txt");
+    
     int input;
     bool running = true;
     string username;
@@ -137,7 +193,11 @@ int main(){
     while(running){
         
         cout << "Enter a number for the following:\n"
-             << "1) Login\n" << "2) Create an account\n" << "3) Delete an account\n" << "4) View Users\n" << "0) Exit\n" << endl;
+             << "1) Login\n" 
+             << "2) Create an account\n" 
+             << "3) Delete an account\n" 
+             << "4) View Users\n" 
+             << "0) Exit\n" << endl;
     
         cin >> input;
 
@@ -164,6 +224,10 @@ int main(){
             case 2 : {
                 cout << "\nEnter a username: ";
                 cin >> username;
+                try {
+                    User existingUser = casinoBase.search(username);
+                    cout << "Error: That Username is already in use!\n";
+                } catch (const std::runtime_error& e) {
                 User newUser(username);
                 cout << "Enter password: ";
                 cin >> password;
@@ -179,7 +243,7 @@ int main(){
                 << "Username: " << newUser.getUsername() << endl
                 << "Name: " << newUser.getFirstName() << " " << newUser.getLastName() << endl
                 << "Balance: " << fixed << setprecision(2) << newUser.getBalance() << endl;
-
+                }
                 break;
             }
             case 3 : {
@@ -224,7 +288,9 @@ int main(){
 
 
     }
-    cout << "Thank you for using the virtual casino app!\n" << endl;
+    saveUsersToFile(casinoBase, "users.txt");
 
+    cout << "Thank you for using the virtual casino app!\n" << endl;
+    return 0;
 }
 
