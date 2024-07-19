@@ -49,6 +49,8 @@ class Database {
 
         void remove(const K& key);
 
+        std::vector<K> getAllKeys() const ;
+
         V search(const K& key) const;
 
         bool contains(const K& key) const;
@@ -131,6 +133,20 @@ void Database<K, V>::remove(const K& key) {
         delete entry;
         --size;
     }
+}
+
+
+template <typename K, typename V>
+std::vector<K> Database<K, V>::getAllKeys() const {
+    std::vector<K> keys;
+    for (int i = 0; i < capacity; ++i) {
+        Hashnode<K, V>* entry = hashmap[i];
+        while (entry != nullptr) {
+            keys.push_back(entry->key);
+            entry = entry->next;
+        }
+    }
+    return keys;
 }
 
 template <typename K, typename V>
