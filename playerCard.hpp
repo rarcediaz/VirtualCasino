@@ -3,7 +3,7 @@
  *  Author: Rodrigo Arce Diaz
  *   
  * 
- * Last Update: July 17, 2024
+ * Last Update: July 18, 2024
  * 
  */
 
@@ -13,6 +13,7 @@
 
 #include <ostream>
 #include <iomanip>
+#include <string>
 using namespace std;
 
 class User {
