@@ -41,7 +41,8 @@ float blackJackLogic(float bet){
         if(HorS == 'h'){
             playerAmmount += rand() % 10 + 1;
             cout << "\nPlayer: " << playerAmmount << endl;
-        } else if(HorS == 's'){
+        } else if(HorS == 's' || playerAmmount == 21){
+            cout << "Stand at " << playerAmmount << endl;
             turn = false;
         }
         else{
@@ -73,7 +74,7 @@ float blackJackLogic(float bet){
 
     cout << "Dealer: " << dealerAmmount << "\nPlayer: " << playerAmmount << endl;
     cout << "Push, you get your bet ammount back, $" << bet << endl << endl;
-    return bet;
+    return 0;
 
 }
 
@@ -81,8 +82,15 @@ float amountCheck(float balance){
     bool running = true;
     float betAmount;
     while (running){
+        if(balance == 0){
+            cout << "You have no money to bet.\n\n";
+            return balance;
+        }
         cout << "Balance: " << fixed << setprecision(2) << balance << endl;
         cout << "Enter Bet Amount or 0 to exit: ";
+        if(balance == 0){
+            return balance;
+        }
         cin >> betAmount;
         if(betAmount == 0){
             running = false;
@@ -117,7 +125,7 @@ User* blackJack(User* user){
             case 1 : {
                 
             float earnings = amountCheck(user->getBalance());
-            user->addToBalance(earnings);
+            user->setBalance(earnings);
             break;
 
             }
