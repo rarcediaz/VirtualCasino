@@ -3,7 +3,7 @@
  *  Author: Rodrigo Arce Diaz
  *   
  * 
- * Last Update: July 17, 2024
+ * Last Update: July 18, 2024
  * 
  */
 
@@ -12,72 +12,178 @@
 
 #include <unordered_map>
 #include <ostream>
+#include <vector>
+#include <functional>
+#include <stdexcept>
 #include "playerCard.hpp"
 
-class Database{
+template<typename K, typename V>
+class Hashnode{
+    public:
+
+    K key;
+    V value;
+    Hashnode* next;
+
+
+    Hashnode(const K& key, const V& value) : key(key), value(value), next(nullptr) {};
+
+};
+
+template<typename K, typename V>
+class Database {
+
     private:
-    std::unordered_map<std::string, User> users;
+        std::vector<Hashnode<K, V>*> hashmap;
+        int capacity;
+        int size;
+
+    int hashFunction(const K& key) const;
 
     public:
+        Database(int capacity = 10);
 
-    void addUser(const string& user);
+        ~Database();
 
-    void removeUser(const std::string& username);
+        void insert(const K& key, const V& value);
 
-    User* getUser(const std::string& username);
+        void remove(const K& key);
 
-    void printUsers(std::ostream& os);
+        V search(const K& key) const;
 
+        bool contains(const K& key) const;
+
+        int getSize() const;
+
+        bool isEmpty() const;
+
+        void printUsers(std::ostream& os) const;
 
 };
 
-class UsernameAlreadyExists : public exception {
-    public:
-        virtual const char* what() const noexcept {
-            return "Username already exists.";
-    }
-};
 
-void Database::addUser(const string& user){
-    //Add a checker 
-    auto userCheck = users.find(user);
-
-    if(userCheck != nullptr){
-        throw UsernameAlreadyExists();
-    } else
-
-    //Create new user
-    ;
+template <typename K, typename V>
+Database<K, V>::Database(int capacity) : capacity(capacity), size(0) {
+    hashmap.resize(capacity, nullptr);
 }
 
-void Database::removeUser(const std::string& username){
-    users.erase(username);
+template <typename K, typename V>
+Database<K, V>::~Database() {
+    for (int i = 0; i < capacity; ++i) {
+        Hashnode<K, V>* entry = hashmap[i];
+        while (entry != nullptr) {
+            Hashnode<K, V>* prev = entry;
+            entry = entry->next;
+            delete prev;
+        }
+        hashmap[i] = nullptr;
+    }
 }
 
-User* Database::getUser(const std::string& username){
-    auto Usersearch = users.find(username);
-    if(Usersearch != users.end()){
-        return &(Usersearch->second);
-    }
-
-    return nullptr;
+template <typename K, typename V>
+int Database<K, V>::hashFunction(const K& key) const {
+    return std::hash<K>{}(key) % capacity;
 }
 
-void Database::printUsers(std::ostream& os){
-    if(users.empty()){
-        os << "No Users in the System." << std::endl;
-        return;
+template <typename K, typename V>
+void Database<K, V>::insert(const K& key, const V& value) {
+    int hashIndex = hashFunction(key);
+    Hashnode<K, V>* prev = nullptr;
+    Hashnode<K, V>* entry = hashmap[hashIndex];
+
+    while (entry != nullptr && entry->key != key) {
+        prev = entry;
+        entry = entry->next;
     }
 
-    for (const auto& pair : users){
-        const User& user = pair.second;
-        os << "Username: " << user.getUsername() << std::endl
-        << "Name: " << user.getFirstName() << " " << user.getLastName() << std::endl << endl;
-        
+    if (entry == nullptr) {
+        entry = new Hashnode<K, V>(key, value);
+        if (prev == nullptr) {
+            hashmap[hashIndex] = entry;
+        } else {
+            prev->next = entry;
+        }
+        ++size;
+    } else {
+        entry->value = value;
     }
-
 }
 
+template <typename K, typename V>
+void Database<K, V>::remove(const K& key) {
+    int hashIndex = hashFunction(key);
+    Hashnode<K, V>* prev = nullptr;
+    Hashnode<K, V>* entry = hashmap[hashIndex];
+
+    while (entry != nullptr && entry->key != key) {
+        prev = entry;
+        entry = entry->next;
+    }
+
+    if (entry == nullptr) {
+        return; // Key not found
+    } else {
+        if (prev == nullptr) {
+            hashmap[hashIndex] = entry->next;
+        } else {
+            prev->next = entry->next;
+        }
+        delete entry;
+        --size;
+    }
+}
+
+template <typename K, typename V>
+V Database<K, V>::search(const K& key) const {
+    int hashIndex = hashFunction(key);
+    Hashnode<K, V>* entry = hashmap[hashIndex];
+
+    while (entry != nullptr) {
+        if (entry->key == key) {
+            return entry->value;
+        }
+        entry = entry->next;
+    }
+
+    throw std::runtime_error("Key not found");
+}
+
+template <typename K, typename V>
+bool Database<K, V>::contains(const K& key) const {
+    int hashIndex = hashFunction(key);
+    Hashnode<K, V>* entry = hashmap[hashIndex];
+
+    while (entry != nullptr) {
+        if (entry->key == key) {
+            return true;
+        }
+        entry = entry->next;
+    }
+
+    return false;
+}
+
+template <typename K, typename V>
+int Database<K, V>::getSize() const {
+    return size;
+}
+
+template <typename K, typename V>
+bool Database<K, V>::isEmpty() const {
+    return size == 0;
+}
+
+template <typename K, typename V>
+void Database<K, V>::printUsers(std::ostream& os) const {
+    for (int i = 0; i < capacity; ++i) {
+        Hashnode<K, V>* entry = hashmap[i];
+        while (entry != nullptr) {
+            os << "Username: " << entry->key << "\nName: " 
+               << entry->value.getFirstName() << " " << entry->value.getLastName() << "\n\n"; 
+            entry = entry->next;
+        }
+    }
+}
 
 
 
