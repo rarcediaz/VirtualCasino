@@ -11,6 +11,7 @@
 
 #include "database.hpp"
 #include "playerCard.hpp"
+#include "blackjack.cpp"
 
 using std::cout;
 using std::cin;
@@ -76,7 +77,7 @@ User* loggedMenu(User* user){
                 cin >> game;
                 switch(game){
                     case 1 : 
-                    cout <<"This feature has not yet been implemented\n";
+                    user = blackJack(user);
                     break;
 
                     case 2 :
@@ -85,7 +86,7 @@ User* loggedMenu(User* user){
 
                     case 3 : 
                     //Implement Dice Game
-                    cout << "Bruh";
+                    cout << "This feature has not yet been implemented\n";
                     break;
 
                     case 0 :
@@ -94,6 +95,7 @@ User* loggedMenu(User* user){
 
                     default : 
                     cout << "That Choice is not valid, try again.\n";
+                    break;
 
                 }
 
@@ -141,7 +143,7 @@ int main(){
 
         switch(input){
         case 1 : {
-                cout << "Enter Username: ";
+                cout << "\nEnter Username: ";
                 cin >> username;
                 try{
                     User user = casinoBase.search(username);
@@ -160,7 +162,7 @@ int main(){
             }             
 
             case 2 : {
-                cout << "Enter a username: ";
+                cout << "\nEnter a username: ";
                 cin >> username;
                 User newUser(username);
                 cout << "Enter password: ";
@@ -181,7 +183,7 @@ int main(){
                 break;
             }
             case 3 : {
-                cout << "Enter Username: ";
+                cout << "\nEnter Username: ";
                 cin >> username;
                 try{
                     User userToDelete = casinoBase.search(username);
