@@ -1,0 +1,3 @@
+spiderman,Peter,Parker,125.00,spidey
+redhead,Mary,Foster,500.00,mjf123
+rod,Rodrigo,Arce,1500.00,123
