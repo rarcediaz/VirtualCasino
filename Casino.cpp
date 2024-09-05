@@ -2,7 +2,7 @@
  *  Author: Rodrigo Arce Diaz
  *   
  * 
- * Last Update: July 18, 2024
+ * Last Update: September 4, 2024
  * 
  */
 
@@ -18,6 +18,7 @@
 using std::cout;
 using std::cin;
 
+//Logged In Menu System
 User* loggedMenu(User* user){
     cout << "\nWelcome " << user->getFirstName() <<"!\n"; 
     bool running = true;
@@ -33,10 +34,12 @@ User* loggedMenu(User* user){
         << "0) Log Out\n";
         cin >> choice;
         switch(choice){
+            //Displays Users Balance
             case 1 :
             cout << "\nBalance: $" << user->getBalance() << endl;
             break;
 
+            //Allows user to add balance up to 10,000
             case 2 :
             cout << "\nHow much would you like to deposit (Max of $10,000): ";
             cin >> deposit;
@@ -51,9 +54,11 @@ User* loggedMenu(User* user){
             }
             break;
 
+            //Allows user to withdraw credits from their account
             case 3 : 
             cout << "\nHow much would you like to withdraw: ";
             cin >> withdraw;
+            //Checker 
             if (withdraw > user->getBalance()){
                 cout <<"You can't withdraw more than what is in your account!\n";
             } else if(withdraw <= 0){
@@ -65,7 +70,7 @@ User* loggedMenu(User* user){
             }
 
             break;
-
+            //Game Selection
             case 4 : {
             bool gameSelection = true;
             int game;
@@ -78,6 +83,7 @@ User* loggedMenu(User* user){
         
                 cin >> game;
                 switch(game){
+                    //Sends the user to blackjack
                     case 1 : 
                     user = blackJack(user);
                     break;
@@ -122,7 +128,7 @@ User* loggedMenu(User* user){
     }
     return user;
 }
-
+//Reads all the preloaded users from a file and creates user objects for them
 void loadUsersFromFile(Database<string, User>& casinoBase, const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
@@ -148,13 +154,14 @@ void loadUsersFromFile(Database<string, User>& casinoBase, const string& filenam
             newUser.setLastName(lastName);
             newUser.addToBalance(balance); // Initial balance
             newUser.setPassword(password);
-
+            //Inserts the user into the database once created
             casinoBase.insert(username, newUser);
         }
     }
     file.close();
 }
 
+//Saves all the users to a file to be used when opening the application again
 void saveUsersToFile(Database<string, User>& casinoBase, const string& filename) {
     ofstream file(filename);
     if (!file.is_open()) {
@@ -177,7 +184,7 @@ void saveUsersToFile(Database<string, User>& casinoBase, const string& filename)
 
 
 int main(){
-
+    //Creates a hashmap database
     Database<string, User> casinoBase;
     loadUsersFromFile(casinoBase, "users.txt");
     
@@ -200,8 +207,9 @@ int main(){
              << "0) Exit\n" << endl;
     
         cin >> input;
-
+        
         switch(input){
+        //Goes to the login menu if successful login
         case 1 : {
                 cout << "\nEnter Username: ";
                 cin >> username;
@@ -220,7 +228,7 @@ int main(){
                 }
                 break;
             }             
-
+            //Creates an account as long as the username is not already used
             case 2 : {
                 cout << "\nEnter a username: ";
                 cin >> username;
@@ -246,6 +254,7 @@ int main(){
                 }
                 break;
             }
+            //Used to delete a user from the system
             case 3 : {
                 cout << "\nEnter Username: ";
                 cin >> username;
@@ -272,7 +281,7 @@ int main(){
 
                 break;
             }
-
+            //Prints out a list of all the usernames
             case 4 : 
                 casinoBase.printUsers(cout);
                 break;
@@ -288,6 +297,7 @@ int main(){
 
 
     }
+    //Saves all of the users to file upon exiting of the menu
     saveUsersToFile(casinoBase, "users.txt");
 
     cout << "Thank you for using the virtual casino app!\n" << endl;
